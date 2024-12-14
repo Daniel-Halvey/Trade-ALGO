@@ -1,0 +1,72 @@
+import time
+import datetime
+
+# Hypothetical Robinhood API functions (replace with actual API calls if available)
+def get_historical_data(symbol, interval="day", span="year"):
+    """Hypothetical function to fetch historical price data."""
+    # In a real implementation, this would make an API call.
+    # This is placeholder data; replace with real data if available.
+    if symbol == "TSLA":  # Changed symbol to TSLA
+        return [
+            {"close_price": 170, "date": "2024-01-01"},
+            {"close_price": 175, "date": "2024-01-02"},
+            {"close_price": 180, "date": "2024-01-03"},
+            {"close_price": 178, "date": "2024-01-04"},
+            {"close_price": 182, "date": "2024-01-05"},
+            {"close_price": 185, "date": "2024-01-08"},
+            {"close_price": 183, "date": "2024-01-09"},
+            {"close_price": 188, "date": "2024-01-10"},
+            {"close_price": 190, "date": "2024-01-11"},
+            {"close_price": 192, "date": "2024-01-12"},
+            {"close_price": 195, "date": "2024-01-15"},
+            {"close_price": 191, "date": "2024-01-16"},
+            {"close_price": 189, "date": "2024-01-17"},
+        ]
+    else:
+        return []
+
+def place_order(symbol, quantity, side="buy"):
+    """Hypothetical function to place a market order."""
+    print(f"Placing {side} order for {quantity} shares of {symbol}")
+    # In a real implementation, this would make an API call.
+    return True  # Assume successful order for now
+
+def calculate_sma(data, window):
+    """Calculates the simple moving average."""
+    if len(data) < window:
+        return None
+    prices = [item["close_price"] for item in data]
+    return sum(prices[-window:]) / window
+
+def trading_strategy(symbol="TSLA", short_window=3, long_window=5): #Symbol is now TSLA
+    """Implements a simple moving average crossover strategy."""
+    while True:
+        historical_data = get_historical_data(symbol)
+        if not historical_data:
+            print("Could not retrieve historical data.")
+            time.sleep(60)  # Wait for 60 seconds before retrying
+            continue
+
+        short_sma = calculate_sma(historical_data, short_window)
+        long_sma = calculate_sma(historical_data, long_window)
+
+        if short_sma is None or long_sma is None:
+            print("Not enough data to calculate SMAs.")
+            time.sleep(60)
+            continue
+
+        last_data_point = historical_data[-1]
+        current_date = last_data_point["date"]
+        print(f"Date: {current_date} - Short SMA: {short_sma:.2f}, Long SMA: {long_sma:.2f}")
+
+        if short_sma > long_sma:
+            print("Short SMA crossed above Long SMA. Potential buy signal.")
+            place_order(symbol, 1)  # Buy 1 share (in a real system, determine quantity)
+        elif short_sma < long_sma:
+            print("Short SMA crossed below Long SMA. Potential sell signal.")
+            place_order(symbol, 1, side="sell")  # Sell 1 share
+
+        time.sleep(60)  # Check every 60 seconds
+
+if __name__ == "__main__":
+    trading_strategy()
